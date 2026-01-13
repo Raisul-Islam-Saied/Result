@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="bn" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মাদ্রাসা এডুকেশন প্রো | টিচার প্যানেল</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SheetJS for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Hind Siliguri"', 'sans-serif'] },
+                    colors: {
+                        brand: { 500: '#10b981', 600: '#059669', 800: '#065f46', 900: '#064e3b' },
+                        gold: '#d4af37',
+                        dark: { 800: '#1f2937', 900: '#111827' }
+                    },
+                    animation: {
+                        'bounce-short': 'bounce 0.5s ease-in-out 1',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Glassmorphism & Custom Scrollbar */
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        .dark .glass { background: rgba(17, 24, 39, 0.7); }
+        
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 20px; }
+        
+        .input-premium { 
+            transition: all 0.3s; 
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); 
+        }
+        .input-premium:focus { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2); 
+        }
+
+        /* Print Settings */
+        @media print {
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col overflow-hidden">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-16 bg-white dark:bg-dark-800 shadow-md flex items-center justify-between px-6 z-40 relative">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-900 text-gold flex items-center justify-center text-xl shadow-lg border border-gold">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-tight">Teacher<span class="text-brand-600">Pro</span></h1>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Marks Entry System</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Theme Toggle -->
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+            
+            <!-- Profile Dropdown Trigger -->
+            <div class="flex items-center gap-3 border-l pl-4 dark:border-gray-700">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-bold" id="navTeacher">Raisul Islam Saied</p>
+                    <p class="text-xs text-brand-600 dark:text-brand-400">ID: T-2026-01</p>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Raisul+Islam&background=059669&color=fff" class="w-10 h-10 rounded-full border-2 border-brand-500 shadow-sm cursor-pointer">
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white dark:bg-dark-800 border-r dark:border-gray-700 hidden md:flex flex-col z-30">
+            <nav class="p-4 space-y-2 flex-1">
+                <a href="#" onclick="showDashboard()" class="flex items-center gap-3 px-4 py-3 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-xl font-bold transition border-l-4 border-brand-600">
+                    <i class="fa-solid fa-border-all w-5"></i> ড্যাশবোর্ড
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition font-medium">
+                    <i class="fa-solid fa-clock-rotate-left w-5"></i> ইতিহাস
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition font-medium">
+                    <i class="fa-solid fa-gear w-5"></i> সেটিংস
+                </a>
+            </nav>
+            <div class="p-4 border-t dark:border-gray-700">
+                <button class="w-full flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-3 rounded-xl transition text-sm font-bold">
+                    <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto custom-scroll relative bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+            
+            <!-- VIEW: DASHBOARD (Subject Selection) -->
+            <div id="viewDashboard" class="animate-fade-in max-w-6xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">স্বাগতম, স্যার! 👋</h2>
+                    <p class="text-gray-500 dark:text-gray-400">নিচে আপনার অ্যাসাইন করা বিষয়গুলো থেকে মার্ক এন্ট্রি শুরু করুন।</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="subjectContainer">
+                    <!-- Dynamic Cards Here -->
+                </div>
+            </div>
+
+            <!-- VIEW: MARK ENTRY INTERFACE -->
+            <div id="viewEntry" class="hidden h-full flex flex-col max-w-7xl mx-auto">
+                
+                <!-- Breadcrumb & Actions -->
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="showDashboard()" class="flex items-center gap-2 text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                        <div class="w-8 h-8 rounded-full bg-white dark:bg-dark-800 shadow flex items-center justify-center">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </div>
+                        <span class="font-bold">বিষয় তালিকায় ফেরত যান</span>
+                    </button>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="toggleModal('infoModal')" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition" title="বিষয় তথ্য">
+                            <i class="fa-solid fa-info"></i>
+                        </button>
+                        <button onclick="exportData('pdf')" class="w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition" title="PDF ডাউনলোড">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
+                        <button onclick="exportData('excel')" class="w-10 h-10 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center transition" title="Excel ডাউনলোড">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+                    
+                    <!-- LEFT COLUMN: INPUT CARD (4 cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        
+                        <!-- Main Input Card -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative" id="inputCard">
+                            <!-- Background Pattern -->
+                            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-brand-600 to-brand-800 z-0"></div>
+                            
+                            <div class="relative z-10 px-6 pt-8 pb-6 flex flex-col items-center text-center">
+                                <div class="w-24 h-24 rounded-full border-4 border-white dark:border-dark-800 shadow-md bg-gray-200 mb-3 overflow-hidden">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Student" class="w-full h-full object-cover">
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-800 dark:text-white" id="stuName">...</h3>
+                                <p class="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full mt-1 mb-6">
+                                    Roll: <span id="stuRoll" class="text-brand-600 font-bold text-lg">...</span>
+                                </p>
+
+                                <form onsubmit="submitMark(event)" class="w-full space-y-4">
+                                    <div class="relative group">
+                                        <input type="number" id="markInput" placeholder="00" min="0" class="input-premium w-full text-center text-5xl font-bold py-6 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border-2 border-transparent focus:border-brand-500 outline-none" required>
+                                        <span class="absolute top-2 right-4 text-xs text-gray-400 font-bold">Total: <span id="maxMarkDisplay">100</span></span>
+                                    </div>
+
+                                    <!-- Controls -->
+                                    <div class="flex justify-between items-center gap-3">
+                                        <label class="flex items-center gap-2 cursor-pointer select-none bg-gray-100 dark:bg-gray-700 px-3 py-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition w-1/2 justify-center">
+                                            <input type="checkbox" id="absentCheck" onchange="toggleAbsent()" class="w-5 h-5 text-red-600 rounded focus:ring-red-500 border-gray-300">
+                                            <span class="text-sm font-bold text-gray-600 dark:text-gray-300">অনুপস্থিত (AB)</span>
+                                        </label>
+                                        <button type="button" onclick="prevStudent()" class="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 flex items-center justify-center text-gray-600 dark:text-white transition">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                        </button>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 transform active:scale-95 transition flex items-center justify-center gap-2">
+                                        সাবমিট ও পরবর্তী <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div class="bg-gray-100 dark:bg-gray-700 h-2 w-full mt-2">
+                                <div id="progressBar" class="h-full bg-brand-500 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-center text-xs text-gray-500 py-1" id="progressText">0 / 0 সম্পন্ন</div>
+                        </div>
+
+                        <!-- Mini Stats (Donut Chart) -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-4">লাইভ ফলাফল বিশ্লেষণ</h4>
+                            <div class="w-40 h-40 relative">
+                                <canvas id="liveChart"></canvas>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <span class="text-2xl font-bold text-gray-700 dark:text-gray-300" id="passPercentage">0%</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 mt-4 text-xs font-bold">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> পাস</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> ফেল</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span> বাকি</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: DATA TABLE (8 cols) -->
+                    <div class="lg:col-span-8 flex flex-col gap-4">
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex-1 overflow-hidden flex flex-col" id="printableArea">
+                            
+                            <!-- Header for Print -->
+                            <div class="hidden p-8 text-center border-b border-gray-200">
+                                <h2 class="text-3xl font-bold text-black">আব্দুর রাজ্জাক দাখিল মাদ্রাসা</h2>
+                                <p class="text-black mt-2">ফলাফল তালিকা - <span id="printHeaderInfo"></span></p>
+                            </div>
+
+                            <!-- Sticky Header -->
+                            <div class="p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex justify-between items-center no-print">
+                                <h3 class="font-bold text-gray-700 dark:text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-table-list text-brand-600"></i> মার্কশিট তালিকা
+                                </h3>
+                                <span class="text-xs bg-brand-100 text-brand-700 px-2 py-1 rounded font-bold" id="subjectBadge">...</span>
+                            </div>
+
+                            <!-- Scrollable Table -->
+                            <div class="overflow-auto flex-1 custom-scroll p-0">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs uppercase sticky top-0 z-10">
+                                        <tr>
+                                            <th class="p-4 font-bold">ক্রমিক</th>
+                                            <th class="p-4 font-bold">রোল</th>
+                                            <th class="p-4 font-bold">শিক্ষার্থীর নাম</th>
+                                            <th class="p-4 font-bold text-center">নম্বর</th>
+                                            <th class="p-4 font-bold text-center">গ্রেড</th>
+                                            <th class="p-4 font-bold text-right no-print">এডিট</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="marksTableBody" class="text-sm divide-y divide-gray-100 dark:divide-gray-700">
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                                <div id="emptyState" class="flex flex-col items-center justify-center h-64 text-gray-400">
+                                    <i class="fa-solid fa-clipboard-question text-5xl mb-3 opacity-20"></i>
+                                    <p>এখনও কোনো ডাটা নেই</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700 text-right no-print">
+                                <button onclick="finalSubmit()" class="bg-gray-900 dark:bg-brand-600 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2 ml-auto">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> ফাইনাল সাবমিট
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Info Modal -->
+    <div id="infoModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-800 rounded-xl p-6 max-w-sm w-full shadow-2xl animate-bounce-short">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">বিষয় তথ্য</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <p class="flex justify-between border-b pb-1"><span>বিষয়:</span> <span class="font-bold" id="infoSub"></span></p>
+                <p class="flex justify-between border-b pb-1"><span>শ্রেণী:</span> <span class="font-bold" id="infoClass"></span></p>
+                <p class="flex justify-between border-b pb-1"><span>পূর্ণমান:</span> <span class="font-bold" id="infoFull"></span></p>
+                <p class="flex justify-between border-b pb-1"><span>পাস মার্ক:</span> <span class="font-bold" id="infoPass"></span></p>
+            </div>
+            <button onclick="toggleModal('infoModal')" class="mt-6 w-full bg-gray-200 dark:bg-gray-700 py-2 rounded-lg font-bold">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        const subjects = [
+            { id: 1, name: "কুরআন মাজিদ", class: "১ম শ্রেণী", exam: "১ম সাময়িক", full: 100, pass: 33, icon: "fa-book-quran", color: "text-emerald-500" },
+            { id: 2, name: "বাংলা সাহিত্য", class: "১ম শ্রেণী", exam: "১ম সাময়িক", full: 100, pass: 33, icon: "fa-language", color: "text-blue-500" },
+            { id: 3, name: "প্রাথমিক গণিত", class: "২য় শ্রেণী", exam: "১ম সাময়িক", full: 100, pass: 33, icon: "fa-calculator", color: "text-orange-500" },
+            { id: 4, name: "ইংরেজি", class: "২য় শ্রেণী", exam: "১ম সাময়িক", full: 100, pass: 33, icon: "fa-font", color: "text-purple-500" },
+        ];
+
+        // Demo Students Generator
+        const generateStudents = (count) => Array.from({length: count}, (_, i) => ({
+            id: i+1, roll: i+1, name: ["আব্দুল্লাহ", "উমর ফারুক", "উসমান গনি", "আলী হায়দার", "হাসান", "হুসাইন", "সায়েদ", "বেলাল", "খালিদ", "তারেক", "সালমান", "জুবায়ের"][i % 12] + (i > 11 ? ` ${i}` : "")
+        }));
+
+        let currentSub = null;
+        let students = [];
+        let marksData = {}; // { roll: {mark: 80, isAbsent: false} }
+        let currentIndex = 0;
+        let chartInstance = null;
+
+        // --- INIT ---
+        window.onload = () => {
+            renderDashboard();
+            initChart();
+            
+            // Check for saved theme
+            if(localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        };
+
+        // --- THEME ---
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        // --- DASHBOARD FUNCTIONS ---
+        function renderDashboard() {
+            const container = document.getElementById('subjectContainer');
+            container.innerHTML = '';
+            
+            subjects.forEach(sub => {
+                // Check if data exists in local storage
+                const saved = localStorage.getItem(`sub_${sub.id}`);
+                const progress = saved ? JSON.parse(saved).length : 0;
+                
+                const card = `
+                    <div onclick="openSubject(${sub.id})" class="bg-white dark:bg-dark-800 rounded-2xl p-6 shadow-sm hover:shadow-2xl border border-gray-100 dark:border-gray-700 cursor-pointer group transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition">
+                            <i class="fa-solid ${sub.icon} text-8xl"></i>
+                        </div>
+                        
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-3xl ${sub.color} shadow-inner">
+                                <i class="fa-solid ${sub.icon}"></i>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">${sub.exam}</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-1">${sub.name}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">${sub.class}</p>
+                        
+                        <div class="relative pt-4 border-t dark:border-gray-700">
+                            <div class="flex justify-between text-xs font-bold mb-1 text-gray-500">
+                                <span>স্ট্যাটাস</span>
+                                <span>${progress} / 30 সম্পন্ন</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-brand-500 h-2 rounded-full" style="width: ${(progress/30)*100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function openSubject(id) {
+            currentSub = subjects.find(s => s.id === id);
+            students = generateStudents(30); // Demo 30 students
+            
+            // Restore Data
+            const saved = localStorage.getItem(`sub_${id}`);
+            marksData = saved ? JSON.parse(saved) : {};
+            
+            // Determine first unfilled index
+            currentIndex = students.findIndex(s => !marksData[s.roll]);
+            if(currentIndex === -1) currentIndex = 0; // All filled
+
+            // UI Update
+            document.getElementById('viewDashboard').classList.add('hidden');
+            document.getElementById('viewEntry').classList.remove('hidden');
+            
+            document.getElementById('subjectBadge').innerText = `${currentSub.name} - ${currentSub.class}`;
+            document.getElementById('printHeaderInfo').innerText = `${currentSub.exam} | ${currentSub.name} | ${currentSub.class}`;
+            document.getElementById('maxMarkDisplay').innerText = currentSub.full;
+            
+            // Info Modal Data
+            document.getElementById('infoSub').innerText = currentSub.name;
+            document.getElementById('infoClass').innerText = currentSub.class;
+            document.getElementById('infoFull').innerText = currentSub.full;
+            document.getElementById('infoPass').innerText = currentSub.pass;
+
+            updateEntryUI();
+            renderTable();
+            updateChart();
+        }
+
+        function showDashboard() {
+            document.getElementById('viewEntry').classList.add('hidden');
+            document.getElementById('viewDashboard').classList.remove('hidden');
+            renderDashboard(); // Refresh progress bars
+        }
+
+        // --- ENTRY LOGIC ---
+        function updateEntryUI() {
+            if(currentIndex >= students.length) {
+                // End of list
+                document.getElementById('inputCard').classList.add('opacity-50', 'pointer-events-none');
+                return;
+            }
+            document.getElementById('inputCard').classList.remove('opacity-50', 'pointer-events-none');
+
+            const s = students[currentIndex];
+            document.getElementById('stuName').innerText = s.name;
+            document.getElementById('stuRoll').innerText = s.roll;
+            
+            // Reset Input
+            const input = document.getElementById('markInput');
+            const abCheck = document.getElementById('absentCheck');
+            
+            // Pre-fill if editing existing
+            if(marksData[s.roll]) {
+                if(marksData[s.roll].isAbsent) {
+                    abCheck.checked = true;
+                    toggleAbsent();
+                } else {
+                    input.value = marksData[s.roll].mark;
+                    input.disabled = false;
+                    abCheck.checked = false;
+                }
+            } else {
+                input.value = '';
+                input.disabled = false;
+                abCheck.checked = false;
+            }
+            
+            input.focus();
+            
+            // Progress Text
+            const filledCount = Object.keys(marksData).length;
+            document.getElementById('progressText').innerText = `${filledCount} / ${students.length} সম্পন্ন`;
+            document.getElementById('progressBar').style.width = `${(filledCount/students.length)*100}%`;
+        }
+
+        function toggleAbsent() {
+            const cb = document.getElementById('absentCheck');
+            const inp = document.getElementById('markInput');
+            if(cb.checked) {
+                inp.value = '';
+                inp.placeholder = 'ABSENT';
+                inp.disabled = true;
+                inp.classList.add('bg-red-50', 'dark:bg-red-900/20');
+            } else {
+                inp.placeholder = '00';
+                inp.disabled = false;
+                inp.classList.remove('bg-red-50', 'dark:bg-red-900/20');
+                inp.focus();
+            }
+        }
+
+        function submitMark(e) {
+            e.preventDefault();
+            const s = students[currentIndex];
+            const inp = document.getElementById('markInput');
+            const isAb = document.getElementById('absentCheck').checked;
+            
+            let val = 0;
+            if(!isAb) {
+                val = parseInt(inp.value);
+                if(isNaN(val) || val < 0 || val > currentSub.full) {
+                    alert(`দয়া করে ০ থেকে ${currentSub.full} এর মধ্যে নম্বর দিন`);
+                    return;
+                }
+            }
+
+            // Save Logic
+            marksData[s.roll] = {
+                mark: isAb ? 0 : val,
+                isAbsent: isAb
+            };
+
+            // Local Storage Auto Save
+            localStorage.setItem(`sub_${currentSub.id}`, JSON.stringify(marksData));
+
+            renderTable();
+            updateChart();
+
+            // Move Next
+            if(currentIndex < students.length - 1) {
+                currentIndex++;
+                updateEntryUI();
+            } else {
+                alert("শেষ ছাত্রের এন্ট্রি সম্পন্ন হয়েছে!");
+                updateEntryUI(); // Just refresh UI
+            }
+        }
+
+        function prevStudent() {
+            if(currentIndex > 0) {
+                currentIndex--;
+                updateEntryUI();
+            }
+        }
+
+        function editStudent(roll) {
+            currentIndex = students.findIndex(s => s.roll == roll);
+            updateEntryUI();
+            // Scroll to top to see input
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- TABLE RENDER ---
+        function renderTable() {
+            const tbody = document.getElementById('marksTableBody');
+            tbody.innerHTML = '';
+            
+            // Convert marksData object to array matching students order
+            const rows = students.map((s, idx) => {
+                const data = marksData[s.roll];
+                if(!data) return null; // Skip unfilled in table (or show as pending?) Let's show only filled.
+                
+                let statusBadge = '';
+                let grade = '';
+                
+                if(data.isAbsent) {
+                    statusBadge = '<span class="text-red-600 font-bold">ABSENT</span>';
+                    grade = 'F';
+                } else {
+                    const pct = (data.mark / currentSub.full) * 100;
+                    if(data.mark < currentSub.pass) {
+                        statusBadge = `<span class="text-red-500 font-bold">${data.mark}</span>`;
+                        grade = 'F';
+                    } else {
+                        statusBadge = `<span class="text-gray-800 dark:text-gray-200 font-bold">${data.mark}</span>`;
+                        if(pct >= 80) grade = 'A+';
+                        else if(pct >= 70) grade = 'A';
+                        else if(pct >= 60) grade = 'A-';
+                        else if(pct >= 50) grade = 'B';
+                        else if(pct >= 40) grade = 'C';
+                        else if(pct >= 33) grade = 'D';
+                    }
+                }
+
+                return `
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                        <td class="p-4 text-gray-500 text-xs">${idx + 1}</td>
+                        <td class="p-4 font-mono font-bold text-brand-600">${s.roll}</td>
+                        <td class="p-4 font-medium text-gray-800 dark:text-gray-200">${s.name}</td>
+                        <td class="p-4 text-center text-lg">${statusBadge}</td>
+                        <td class="p-4 text-center font-bold text-gray-600 dark:text-gray-400">${grade}</td>
+                        <td class="p-4 text-right no-print">
+                            <button onclick="editStudent(${s.roll})" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).filter(Boolean).join('');
+
+            if(rows) {
+                document.getElementById('emptyState').classList.add('hidden');
+                tbody.innerHTML = rows;
+            } else {
+                document.getElementById('emptyState').classList.remove('hidden');
+            }
+        }
+
+        // --- CHARTS ---
+        function initChart() {
+            const ctx = document.getElementById('liveChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['পাস', 'ফেল/AB', 'বাকি'],
+                    datasets: [{
+                        data: [0, 0, 100],
+                        backgroundColor: ['#10b981', '#ef4444', '#e5e7eb'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateChart() {
+            if(!chartInstance || !currentSub) return;
+            
+            let pass = 0, fail = 0, total = students.length;
+            let entered = 0;
+
+            Object.values(marksData).forEach(d => {
+                entered++;
+                if(d.isAbsent || d.mark < currentSub.pass) fail++;
+                else pass++;
+            });
+
+            const remaining = total - entered;
+            
+            chartInstance.data.datasets[0].data = [pass, fail, remaining];
+            chartInstance.update();
+
+            // Update Percentage Text
+            const passPct = entered > 0 ? Math.round((pass / entered) * 100) : 0;
+            document.getElementById('passPercentage').innerText = `${passPct}%`;
+            
+            // Color code the percentage text
+            const pctEl = document.getElementById('passPercentage');
+            if(passPct >= 80) pctEl.className = "text-2xl font-bold text-green-600";
+            else if(passPct >= 50) pctEl.className = "text-2xl font-bold text-yellow-500";
+            else pctEl.className = "text-2xl font-bold text-red-500";
+        }
+
+        // --- UTILS ---
+        function toggleModal(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        function exportData(type) {
+            if(Object.keys(marksData).length === 0) {
+                alert("এক্সপোর্ট করার জন্য কোনো ডাটা নেই!");
+                return;
+            }
+
+            if(type === 'pdf') {
+                window.print();
+            } else if(type === 'excel') {
+                const data = students.map(s => {
+                    const d = marksData[s.roll];
+                    return d ? {
+                        'Roll': s.roll,
+                        'Name': s.name,
+                        'Marks': d.isAbsent ? 'AB' : d.mark,
+                        'Status': (d.isAbsent || d.mark < currentSub.pass) ? 'FAIL' : 'PASS'
+                    } : null;
+                }).filter(Boolean);
+
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Marksheet");
+                XLSX.writeFile(wb, `${currentSub.name}_Result.xlsx`);
+            }
+        }
+
+        function finalSubmit() {
+            if(confirm("আপনি কি নিশ্চিত যে আপনি এই রেজাল্ট সার্ভারে জমা দিতে চান?")) {
+                const btn = document.querySelector('button[onclick="finalSubmit()"]');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> প্রসেসিং...';
+                setTimeout(() => {
+                    alert("সফলভাবে সাবমিট হয়েছে!");
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> সম্পন্ন';
+                    btn.classList.replace('bg-gray-900', 'bg-green-600');
+                    btn.classList.replace('dark:bg-brand-600', 'bg-green-600');
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+  </html>
